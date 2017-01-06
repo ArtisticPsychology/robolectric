@@ -94,10 +94,10 @@ public class InvokeDynamicSupport {
     if (interceptor != null) {
       try {
         // reload interceptor in sandbox...
+        ClassLoader classLoader = RobolectricInternals.getClassLoader();
         Class<Interceptor> theClass =
-            (Class<Interceptor>) ReflectionHelpers.loadClass(
-                RobolectricInternals.getClassLoader(),
-                interceptor.getClass().getName()).asSubclass(Interceptor.class);
+            (Class<Interceptor>) ReflectionHelpers.loadClass(classLoader, interceptor.getClass().getName())
+                .asSubclass(Interceptor.class);
         return ReflectionHelpers.newInstance(theClass).getMethodHandle(methodName, type);
       } catch (NoSuchMethodException | IllegalAccessException e) {
         throw new RuntimeException(e);

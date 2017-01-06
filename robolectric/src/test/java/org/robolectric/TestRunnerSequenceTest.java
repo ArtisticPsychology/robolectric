@@ -124,7 +124,7 @@ public class TestRunnerSequenceTest {
     @Override
     protected InstrumentationConfiguration createClassLoaderConfig(FrameworkMethod method) {
       InstrumentationConfiguration.Builder builder = new InstrumentationConfiguration.Builder(super.createClassLoaderConfig(method));
-      builder.doNotAcquireClass(StateHolder.class);
+//      builder.doNotAcquireClass(StateHolder.class);
       return builder.build();
     }
 

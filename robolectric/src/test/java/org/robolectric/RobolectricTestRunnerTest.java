@@ -1,6 +1,7 @@
 package org.robolectric;
 
 import android.os.Build;
+import org.hamcrest.CoreMatchers;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Ignore;
