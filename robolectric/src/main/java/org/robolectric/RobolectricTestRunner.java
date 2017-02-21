@@ -10,7 +10,14 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 import org.robolectric.annotation.Config;
-import org.robolectric.internal.*;
+import org.robolectric.internal.AndroidConfigurer;
+import org.robolectric.internal.BuckManifestFactory;
+import org.robolectric.internal.GradleManifestFactory;
+import org.robolectric.internal.SandboxFactory;
+import org.robolectric.internal.SandboxTestRunner;
+import org.robolectric.internal.ManifestFactory;
+import org.robolectric.internal.ManifestIdentifier;
+import org.robolectric.internal.MavenManifestFactory;
 import org.robolectric.android.ParallelUniverse;
 import org.robolectric.android.AndroidInterceptors;
 import org.robolectric.internal.bytecode.ClassHandler;
@@ -346,7 +353,9 @@ public class RobolectricTestRunner extends SandboxTestRunner {
 
     Class<?> buildConstants = config.constants();
     //noinspection ConstantConditions
-    if (buildConstants != null && buildConstants != Void.class) {
+    if (BuckManifestFactory.isBuck()) {
+      return new BuckManifestFactory();
+    } else if (buildConstants != null && buildConstants != Void.class) {
       return new GradleManifestFactory();
     } else {
       return new MavenManifestFactory();
