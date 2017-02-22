@@ -6,8 +6,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import org.robolectric.annotation.internal.DoNotInstrument;
 import org.robolectric.annotation.internal.Instrument;
-import org.robolectric.internal.ShadowExtractor;
-import org.robolectric.shadow.api.Shadow;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -25,14 +23,11 @@ public class InstrumentationConfiguration {
     return new Builder();
   }
 
-  private static final Set<String> CLASSES_TO_ALWAYS_ACQUIRE = Sets.newHashSet(
+  static final Set<String> DEPRECATED_CLASSES_TO_ACQUIRE = Sets.newHashSet(
       RobolectricInternals.class.getName(),
       InvokeDynamicSupport.class.getName(),
-      Shadow.class.getName(),
 
       // these classes are deprecated and will be removed soon:
-      ShadowExtractor.class.getName(),
-      "org.robolectric.internal.Shadow",
       "org.robolectric.res.builder.DefaultPackageManager",
       "org.robolectric.res.builder.DefaultPackageManager$1",
       "org.robolectric.res.builder.DefaultPackageManager$IntentComparator",
@@ -95,19 +90,12 @@ public class InstrumentationConfiguration {
    * @return  True if the class should be loaded.
    */
   public boolean shouldAcquire(String name) {
-    if (CLASSES_TO_ALWAYS_ACQUIRE.contains(name)) {
+    if (DEPRECATED_CLASSES_TO_ACQUIRE.contains(name)) {
       return true;
     }
 
-    // Internal android R class must be loaded from the framework resources in the framework jar.
-    if (name.matches("com\\.android\\.internal\\.R(\\$.*)?")) {
-      return true;
-    }
-
-    // Android SDK code almost universally refers to com.android.internal.R, except
-    // when refering to android.R.stylable, as in HorizontalScrollView. arghgh.
-    // See https://github.com/robolectric/robolectric/issues/521
-    if (name.startsWith("android.R")) {
+    // android.R and com.android.internal.R classes must be loaded from the framework jar
+    if (name.matches("(android|com\\.android\\.internal)\\.R(\\$.+)?")) {
       return true;
     }
 
@@ -120,9 +108,9 @@ public class InstrumentationConfiguration {
       if (name.startsWith(packageName)) return false;
     }
 
+    // R classes must be loaded from system CP
     boolean isRClass = name.matches(".*\\.R(|\\$[a-z]+)$");
     return !isRClass && !classesToNotAcquire.contains(name);
-
   }
 
   public Set<MethodRef> methodsToIntercept() {
